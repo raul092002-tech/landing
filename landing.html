@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOLTA — Energy for the Bold</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a08;
+    --cream: #f2ede4;
+    --acid: #c8ff00;
+    --rust: #d94f2b;
+    --mid: #2a2a25;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--acid);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s, height 0.2s, background 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor.expand { width: 40px; height: 40px; }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.35;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 50;
+    padding: 24px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(242,237,228,0.08);
+    backdrop-filter: blur(8px);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--acid);
+  }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 48px 80px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .tag {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--acid);
+    border: 1px solid var(--acid);
+    display: inline-block;
+    padding: 6px 14px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.6s forwards 0.2s;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 10vw, 140px);
+    line-height: 0.9;
+    letter-spacing: -2px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s forwards 0.4s;
+  }
+
+  h1 em {
+    font-style: italic;
+    font-family: 'DM Serif Display', serif;
+    color: var(--rust);
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    line-height: 1.8;
+    opacity: 0;
+    max-width: 380px;
+    color: rgba(242,237,228,0.65);
+    animation: fadeUp 0.8s forwards 0.6s;
+    margin-bottom: 48px;
+  }
+
+  .cta-row {
+    display: flex; gap: 16px; align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.8s forwards 0.8s;
+  }
+
+  .btn-primary {
+    background: var(--acid);
+    color: var(--black);
+    border: none;
+    padding: 16px 36px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 6px 6px 0 var(--rust);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(242,237,228,0.3);
+    color: var(--cream);
+    padding: 16px 36px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--cream); }
+
+  /* Hero right visual */
+  .hero-right {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-visual {
+    position: relative;
+    width: 100%; height: 100%;
+  }
+
+  .big-circle {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #c8ff0022, transparent 60%),
+                radial-gradient(circle at 70% 70%, #d94f2b33, transparent 60%);
+    border: 1px solid rgba(200,255,0,0.15);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: spin 20s linear infinite;
+  }
+
+  .big-circle::before {
+    content: '';
+    position: absolute;
+    inset: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(200,255,0,0.1);
+    animation: spin 10s linear infinite reverse;
+  }
+
+  .big-circle::after {
+    content: '';
+    position: absolute;
+    inset: 80px;
+    border-radius: 50%;
+    border: 1px solid rgba(217,79,43,0.2);
+  }
+
+  .bolt {
+    position: absolute;
+    font-size: 200px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1;
+    animation: pulse 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(200,255,0,0.4));
+  }
+
+  .floating-stat {
+    position: absolute;
+    background: var(--mid);
+    border: 1px solid rgba(242,237,228,0.1);
+    padding: 16px 24px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    animation: float 4s ease-in-out infinite;
+  }
+  .floating-stat strong {
+    display: block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--acid);
+    letter-spacing: 2px;
+  }
+  .stat-1 { top: 20%; right: 8%; animation-delay: 0s; }
+  .stat-2 { bottom: 25%; left: 5%; animation-delay: 1.5s; }
+
+  /* Marquee */
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid rgba(242,237,228,0.1);
+    border-bottom: 1px solid rgba(242,237,228,0.1);
+    padding: 18px 0;
+    background: var(--mid);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 60px;
+    white-space: nowrap;
+    animation: marquee 18s linear infinite;
+    width: max-content;
+  }
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: rgba(242,237,228,0.4);
+  }
+  .marquee-item span { color: var(--acid); margin-right: 60px; }
+
+  /* FEATURES */
+  .features {
+    padding: 120px 80px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(242,237,228,0.08);
+  }
+  .feature-card {
+    background: var(--black);
+    padding: 56px 48px;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--acid);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .feature-card:hover::before { transform: scaleX(1); }
+  .feature-card:hover { background: var(--mid); }
+
+  .feature-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: rgba(200,255,0,0.12);
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+  .feature-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    margin-bottom: 16px;
+    color: var(--cream);
+  }
+  .feature-desc {
+    font-size: 12px;
+    line-height: 1.9;
+    color: rgba(242,237,228,0.5);
+  }
+
+  /* CTA SECTION */
+  .cta-section {
+    padding: 140px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,255,0,0.06) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .cta-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 24px;
+  }
+  .cta-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 8vw, 110px);
+    line-height: 0.95;
+    margin-bottom: 40px;
+    letter-spacing: -1px;
+  }
+  .cta-heading em {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    color: var(--acid);
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(242,237,228,0.1);
+    padding: 40px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: rgba(242,237,228,0.3);
+    letter-spacing: 1px;
+  }
+  footer .logo { font-family: 'Bebas Neue'; font-size: 20px; letter-spacing: 4px; color: var(--acid); }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 80px 24px 60px; }
+    .hero-right { height: 300px; }
+    .features { grid-template-columns: 1fr; padding: 60px 24px; }
+    .cta-section { padding: 80px 24px; }
+    footer { padding: 32px 24px; flex-direction: column; gap: 16px; text-align: center; }
+    .bolt { font-size: 120px; }
+    .big-circle { width: 280px; height: 280px; }
+    .floating-stat { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<nav>
+  <div class="nav-logo">VOLTA</div>
+  <ul class="nav-links">
+    <li><a href="#">Product</a></li>
+    <li><a href="#">Science</a></li>
+    <li><a href="#">Stories</a></li>
+    <li><a href="#">Shop</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="tag">⚡ Clean Energy Formula</div>
+    <h1>FUEL<br>THE <em>Un-</em><br>STOPPABLE</h1>
+    <p class="hero-sub">
+      VOLTA is engineered for those who refuse to plateau. Zero crash. Zero compromise. Just clean, sustained energy that keeps up with how you actually live.
+    </p>
+    <div class="cta-row">
+      <button class="btn-primary" onmouseenter="cursorExpand()" onmouseleave="cursorShrink()">Get Started</button>
+      <button class="btn-ghost" onmouseenter="cursorExpand()" onmouseleave="cursorShrink()">Watch Film</button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-visual">
+      <div class="big-circle"></div>
+      <div class="bolt">⚡</div>
+      <div class="floating-stat stat-1">
+        <strong>4.8×</strong>
+        Absorption Rate
+      </div>
+      <div class="floating-stat stat-2">
+        <strong>0g</strong>
+        Added Sugar
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">CLEAN ENERGY <span>✦</span></span>
+    <span class="marquee-item">ZERO CRASH <span>✦</span></span>
+    <span class="marquee-item">SCIENCE-BACKED <span>✦</span></span>
+    <span class="marquee-item">PERFORMANCE FUEL <span>✦</span></span>
+    <span class="marquee-item">NO COMPROMISE <span>✦</span></span>
+    <span class="marquee-item">CLEAN ENERGY <span>✦</span></span>
+    <span class="marquee-item">ZERO CRASH <span>✦</span></span>
+    <span class="marquee-item">SCIENCE-BACKED <span>✦</span></span>
+    <span class="marquee-item">PERFORMANCE FUEL <span>✦</span></span>
+    <span class="marquee-item">NO COMPROMISE <span>✦</span></span>
+  </div>
+</div>
+
+<section class="features">
+  <div class="feature-card">
+    <div class="feature-num">01</div>
+    <div class="feature-title">Sustained Release</div>
+    <p class="feature-desc">Patented time-release technology delivers energy in steady waves, not spikes. Six hours of peak performance — no wall, no wobble.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-num">02</div>
+    <div class="feature-title">Neural Clarity</div>
+    <p class="feature-desc">Nootropic blend sharpens focus without jitters. Lion's Mane and Rhodiola work synergistically for cognitive edge under pressure.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-num">03</div>
+    <div class="feature-title">Recovery Stack</div>
+    <p class="feature-desc">Electrolytes, magnesium, and adaptogens rebuild what the day takes out. VOLTA doesn't just push you — it protects you.</p>
+  </div>
+</section>
+
+<section class="cta-section">
+  <p class="cta-label">Limited Drop — May 2026</p>
+  <h2 class="cta-heading">YOUR BEST<br><em>version</em><br>IS WAITING</h2>
+  <button class="btn-primary" style="font-size: 13px; padding: 20px 56px;" onmouseenter="cursorExpand()" onmouseleave="cursorShrink()">Claim Your Box</button>
+</section>
+
+<footer>
+  <div class="logo">VOLTA</div>
+  <div>© 2026 Volta Labs Inc. — All rights reserved.</div>
+  <div>Made for the relentless.</div>
+</footer>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  function cursorExpand() { cursor.classList.add('expand'); }
+  function cursorShrink() { cursor.classList.remove('expand'); }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.style.opacity = '1';
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.feature-card').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transition = `opacity 0.6s ease ${i * 0.15}s`;
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
